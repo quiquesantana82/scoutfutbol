@@ -1488,6 +1488,7 @@ body {
             <label class="form-label">Buscar por apellido</label>
             <div style="display:flex;gap:8px;">
               <input type="text" class="form-input" id="f-api-search" placeholder="Ej: Correa" onkeydown="if(event.key==='Enter'){event.preventDefault();searchApiPlayer()}">
+              <input type="text" class="form-input" id="f-api-pais" placeholder="País (opcional)" style="max-width:130px;" onkeydown="if(event.key==='Enter'){event.preventDefault();searchApiPlayer()}">
               <button type="button" class="btn-primary" style="width:auto;padding:0 16px;flex-shrink:0;" onclick="searchApiPlayer()">🔍</button>
             </div>
           </div>
@@ -2165,7 +2166,7 @@ function getFormData() {
 function clearForm() {
   ['f-nombre','f-nacimiento','f-club','f-pais','f-nacionalidad','f-altura','f-valor',
    'f-stat1-label','f-stat1-val','f-stat2-label','f-stat2-val','f-stat3-label','f-stat3-val',
-   'f-trayectoria','f-seleccion-text','f-bio','f-video','f-video2','f-video3','f-video4','f-foto','f-apiid','f-api-search'].forEach(id => {
+   'f-trayectoria','f-seleccion-text','f-bio','f-video','f-video2','f-video3','f-video4','f-foto','f-apiid','f-api-search','f-api-pais'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('api-search-results').innerHTML = '';
@@ -2235,11 +2236,12 @@ function cancelEdit() { clearForm(); }
 // ─── API-FOOTBALL: VINCULAR JUGADOR ───
 async function searchApiPlayer() {
   const q = document.getElementById('f-api-search').value.trim();
+  const pais = document.getElementById('f-api-pais').value.trim();
   const box = document.getElementById('api-search-results');
   if (q.length < 3) { showToast('⚠️ Escribí al menos 3 letras'); return; }
   box.innerHTML = '<div style="padding:10px;color:var(--muted);font-size:13px;">⏳ Buscando...</div>';
   try {
-    const r = await fetch('/.netlify/functions/link-player?q=' + encodeURIComponent(q));
+    const r = await fetch('/.netlify/functions/link-player?q=' + encodeURIComponent(q) + (pais ? '&pais=' + encodeURIComponent(pais) : ''));
     const j = await r.json();
     if (!r.ok || !j.resultados || !j.resultados.length) {
       box.innerHTML = '<div style="padding:10px;color:var(--muted);font-size:13px;">Sin resultados. Probá solo con el apellido.</div>';
