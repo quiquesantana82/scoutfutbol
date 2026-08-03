@@ -1155,16 +1155,40 @@ body {
 /* Tablets y pantallas medianas */
 @media (min-width: 768px) {
   .section { max-width: 900px; padding: 24px 32px; }
-  #section-ficha, #section-noticias, #section-quienes { max-width: 700px; }
+  #section-noticias, #section-quienes { max-width: 700px; }
   .players-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
-  .ficha-name { font-size: 34px; }
   .topbar { padding-left: 32px; padding-right: 32px; }
+
+  /* Ficha amplia en PC */
+  #section-ficha { max-width: 900px; }
+  .ficha-hero-top { gap: 28px; padding: 28px; }
+  .ficha-photo, .ficha-photo-placeholder { width: 180px; height: 230px; }
+  .ficha-name { font-size: 44px; }
+  .ficha-pos-badge { font-size: 12px; padding: 4px 12px; }
+  .ficha-club { font-size: 16px; }
+  .ficha-market { padding: 10px 16px; }
+  .ficha-market-val { font-size: 26px; }
+  .stat-val { font-size: 34px; }
+  .data-row { padding: 12px 18px; }
+  .data-label, .data-val { font-size: 15px; }
+  .bio-text { font-size: 15px; line-height: 1.7; }
+
+  /* Datos personales y estadísticas lado a lado */
+  .ficha-tables-wrap {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 14px;
+    align-items: start;
+    margin-bottom: 14px;
+  }
+  .ficha-tables-wrap .data-table { margin-bottom: 0; }
 }
 
 /* Escritorio grande */
 @media (min-width: 1100px) {
   .section { max-width: 1080px; }
   .players-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  #section-ficha { max-width: 980px; }
 }
 
 /* Celulares chicos */
@@ -1842,6 +1866,7 @@ function showFicha(idx) {
 
     ${stats ? `<div class="stats-grid">${stats}</div>` : ''}
 
+    <div class="ficha-tables-wrap">
     ${renderApiStats(p)}
 
     <div class="data-table">
@@ -1850,6 +1875,7 @@ function showFicha(idx) {
       ${p.nacionalidad ? `<div class="data-row"><span class="data-label">Nacionalidad</span><span class="data-val">${p.nacionalidad}</span></div>` : ''}
       ${p.altura ? `<div class="data-row"><span class="data-label">Altura</span><span class="data-val">${p.altura}</span></div>` : ''}
       ${p.club ? `<div class="data-row"><span class="data-label">Club actual</span><span class="data-val">${p.club}</span></div>` : ''}
+    </div>
     </div>
 
     ${trayectoria ? `
