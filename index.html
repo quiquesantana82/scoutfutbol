@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scout Fútbol</title>
 <!-- Open Graph: vista previa al compartir en WhatsApp / redes -->
 <meta property="og:type" content="website">
@@ -1149,6 +1149,30 @@ body {
   margin-bottom: 16px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border);
+}
+
+/* ─── RESPONSIVE ─── */
+/* Tablets y pantallas medianas */
+@media (min-width: 768px) {
+  .section { max-width: 900px; padding: 24px 32px; }
+  #section-ficha, #section-noticias, #section-quienes { max-width: 700px; }
+  .players-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .ficha-name { font-size: 34px; }
+  .topbar { padding-left: 32px; padding-right: 32px; }
+}
+
+/* Escritorio grande */
+@media (min-width: 1100px) {
+  .section { max-width: 1080px; }
+  .players-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
+}
+
+/* Celulares chicos */
+@media (max-width: 380px) {
+  .players-grid { gap: 10px; }
+  .ficha-name { font-size: 22px; }
+  .stat-val { font-size: 20px; }
+  .ficha-hero-top { flex-wrap: wrap; }
 }
 
 </style>
