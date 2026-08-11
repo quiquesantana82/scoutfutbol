@@ -2395,7 +2395,7 @@ function parseWyscout(rows){
   data.forEach(r => String(r[3] || '').split(',').forEach(t => { t = t.trim(); if (t) cont[t] = (cont[t] || 0) + 1; }));
   const princ = Object.keys(cont).sort((a,b) => cont[b] - cont[a])[0] || '';
   const perfil = wyPerfil(princ);
-  const zonas = Object.keys(cont).filter(c => WY_POS_XY[c]).sort((a,b) => cont[b] - cont[a]).slice(0,4);
+  const zonas = Object.keys(cont).filter(c => WY_POS_XY[c]).sort((a,b) => cont[b] - cont[a]).slice(0,3);
 
   // agrupar por temporada usando el año de la fecha
   const grupos = {};
@@ -2434,6 +2434,7 @@ function parseWyscout(rows){
 
 function renderPitch(zonas, princ){
   if (!zonas || !zonas.length) return '';
+  zonas = zonas.slice(0, 3);
   const dot = (code) => {
     const xy = WY_POS_XY[code]; if (!xy) return '';
     const primary = code === princ ? ' primary' : '';
@@ -2453,33 +2454,47 @@ function renderPitch(zonas, princ){
   </svg></div>`;
 }
 
+function wySeasonCardHTML(s, esArq){
+  const rows = [['Partidos', s.partidos], ['Minutos', s.minutos]];
+  if (esArq) {
+    rows.push(['Goles recibidos', s.goles_recibidos], ['Atajadas', s.atajadas]);
+    if (s.paradas_pct != null) rows.push(['% de atajadas', wyPct(s.paradas_pct, 70)]);
+    if (s.xcg) rows.push(['xCG', s.xcg]);
+  } else {
+    rows.push(['Goles', s.goles], ['Asistencias', s.asistencias]);
+    if (s.remates != null) rows.push(['Remates', s.remates]);
+    if (s.xg) rows.push(['xG', s.xg]);
+    if (s.precision_pases != null) rows.push(['Precisión de pases', wyPct(s.precision_pases, 80)]);
+    if (s.duelos_pct != null) rows.push(['Duelos ganados', wyPct(s.duelos_pct, 55)]);
+    if (s.aereos_pct != null) rows.push(['Aéreos ganados', wyPct(s.aereos_pct, 55)]);
+    if (s.intercepciones != null) rows.push(['Intercepciones', s.intercepciones]);
+  }
+  if (s.ligas) rows.push(['Competencias', `<span style="font-size:11px;">${s.ligas}</span>`]);
+  return `<div class="wy-season-card"><div class="wy-season-head">Temporada ${s.temporada_label}</div>
+    ${rows.map(([l,v]) => `<div class="wy-stat-row"><span>${l}</span><span>${v}</span></div>`).join('')}</div>`;
+}
+
+function switchWyscoutPreviewSeason(i){
+  const s = _wyscoutData && _wyscoutData.temporadas[parseInt(i)];
+  if (!s) return;
+  document.getElementById('wy-prev-season').innerHTML = wySeasonCardHTML(s, _wyscoutData.perfil === 'arquero');
+}
+
 function renderWyscoutPreview(res){
   const box = document.getElementById('wyscout-preview');
   if (!res) { box.innerHTML = ''; return; }
   const esArq = res.perfil === 'arquero';
-  const cards = res.temporadas.map(s => {
-    const rows = [['Partidos', s.partidos], ['Minutos', s.minutos]];
-    if (esArq) {
-      rows.push(['Goles recibidos', s.goles_recibidos], ['Atajadas', s.atajadas]);
-      if (s.paradas_pct != null) rows.push(['% de atajadas', wyPct(s.paradas_pct, 70)]);
-      if (s.xcg) rows.push(['xCG', s.xcg]);
-    } else {
-      rows.push(['Goles', s.goles], ['Asistencias', s.asistencias]);
-      if (s.remates != null) rows.push(['Remates', s.remates]);
-      if (s.xg) rows.push(['xG', s.xg]);
-      if (s.precision_pases != null) rows.push(['Precisión de pases', wyPct(s.precision_pases, 80)]);
-      if (s.duelos_pct != null) rows.push(['Duelos ganados', wyPct(s.duelos_pct, 55)]);
-      if (s.aereos_pct != null) rows.push(['Aéreos ganados', wyPct(s.aereos_pct, 55)]);
-      if (s.intercepciones != null) rows.push(['Intercepciones', s.intercepciones]);
-    }
-    if (s.ligas) rows.push(['Competencias', `<span style="font-size:11px;">${s.ligas}</span>`]);
-    return `<div class="wy-season-card"><div class="wy-season-head">Temporada ${s.temporada_label}</div>
-      ${rows.map(([l,v]) => `<div class="wy-stat-row"><span>${l}</span><span>${v}</span></div>`).join('')}</div>`;
-  }).join('');
+  const t = res.temporadas; // ya viene ordenado de la más nueva a la más vieja
+  const selector = t.length > 1
+    ? `<select class="season-select" onchange="switchWyscoutPreviewSeason(this.value)" style="margin-bottom:10px;" title="Elegí la temporada">
+        ${t.map((s,i) => `<option value="${i}">Temporada ${s.temporada_label}</option>`).join('')}
+      </select>`
+    : '';
   box.innerHTML = `
     <div style="font-size:12px;margin-bottom:6px;">Posición principal: <b>${WY_POS_ES[res.princ] || res.princ || '—'}</b> · perfil <b>${res.perfil}</b></div>
     ${renderPitch(res.zonas, res.princ)}
-    ${cards}
+    ${selector}
+    <div id="wy-prev-season">${wySeasonCardHTML(t[0], esArq)}</div>
     <button class="btn-primary" style="margin-top:6px;" onclick="guardarWyscout()">💾 Guardar estadísticas de Wyscout</button>`;
 }
 
